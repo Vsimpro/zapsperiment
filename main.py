@@ -1,7 +1,7 @@
 """
 Playwright with remote ZAP proxy on a server
 """
-import time, json
+import os, time, json
 
 from zapv2 import ZAPv2
 from datetime import datetime
@@ -15,7 +15,7 @@ from database import queries as sqlite_queries
 #
 # Global Variables
 #
-ZAP_SERVER_IP = "localhost"#"192.168.29.129"
+ZAP_SERVER_IP = "172.17.0.2"#"192.168.29.129"
 ZAP_PORT      = "8080"
 
 ZAP_PROXY     = f"http://{ZAP_SERVER_IP}:{ZAP_PORT}"
@@ -100,6 +100,8 @@ def export_data( zap : ZAPv2 ):
     print(f"[{stamp()}][{__name__}][✈] Writing data to cache/ ...")
     
     # Write data to disk
+    if not os.path.isdir("cache"): os.makedirs("cache")
+    
     with open("cache/remote_zap_urls.txt", "w+") as f:
         for _url in urls: f.write(_url + "\n")
 
@@ -153,8 +155,6 @@ def main( url ):
             (url, status, text, encoding, created_at)
         )
         
-        print( row )
-        
     print(f"[{stamp()}][{__name__}][✓] Done! Pushed into database")
     
     
@@ -176,5 +176,5 @@ if __name__ == '__main__':
     #
     #   Main entry
     #
-    main( "https://vsim.xyz" )
+    main( "https://wtfismyip.com/" )
     

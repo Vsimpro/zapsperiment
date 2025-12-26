@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS ZapCookies (
     
     cookies  TEXT    NOT NULL, -- Cookies as JSON
     
-    FOREIGN KEY(entry) REFERENCES ZapHistoryEntry(id) ON DELETE CASCADE
+    FOREIGN KEY(entry_id) REFERENCES ZapHistoryEntry(id) ON DELETE CASCADE
 );
 """
 
@@ -61,6 +61,6 @@ CREATE TABLE IF NOT EXISTS ZapHeaders (
     
     headers  TEXT    NOT NULL, -- Headers as JSON 
     
-    FOREIGN KEY(entry) REFERENCES ZapHistoryEntry(id) ON DELETE CASCADE
+    FOREIGN KEY(entry_id) REFERENCES ZapHistoryEntry(id) ON DELETE CASCADE
 );
 """

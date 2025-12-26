@@ -2,9 +2,9 @@ FROM zaproxy/zap-stable
 
 USER root
 
-# Install Tor and Privoxy
+# Install Tor and Proxychains
 RUN apt-get update && \
-    apt-get install -y tor privoxy && \
+    apt-get install -y tor proxychains-ng && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Chromium runtime dependencies
@@ -51,23 +51,26 @@ RUN apt-get install python3 python3-pip -y
 
 COPY . .
 
+# Install Python dependencies + playwright
 RUN pip install -r requirements.txt --break-system-packages
-
 RUN playwright install chromium
 
 # Configure Tor
 RUN echo "SOCKSPort 9050" >> /etc/tor/torrc && \
     echo "Log notice stdout" >> /etc/tor/torrc
 
-# Configure Privoxy to forward to Tor
-RUN echo "forward-socks5   /   127.0.0.1:9050 ." >> /etc/privoxy/config && \
-    echo "listen-address   0.0.0.0:8118" >> /etc/privoxy/config
+# Configure proxychains
+RUN echo "\
+strict_chain\n\
+proxy_dns\n\
+[ProxyList]\n\
+socks5 127.0.0.1 9050\n\
+" > /etc/proxychains.conf
 
 # Start Tor, then ZAP (daemon mode, routed via Tor)
 CMD tor & \
-    privoxy /etc/privoxy/config & \
     python3 app.py & \
-    zap.sh \
+    proxychains zap.sh \
       -daemon \
       -host 0.0.0.0 \
       -port 8080 \
