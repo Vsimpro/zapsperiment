@@ -1,5 +1,6 @@
 import time, json
 from flask import Blueprint, jsonify, request
+from urllib.parse import unquote
 
 from zapv2 import ZAPv2
 from datetime import datetime
@@ -117,15 +118,18 @@ def status():
     return "200"
 
 
-@api.route( "/visit/<url>"  )
-@api.route( "/visit/<url>/" )
-def visit( url ):
+@api.route( "/visit"  )
+@api.route( "/visit/" )
+def visit():
     global ZAP_INSTANCE
     
     if ZAP_INSTANCE == None:
         ZAP_INSTANCE = connect_zap()
         
     ZAP_INSTANCE.core.new_session(name="clean_session", overwrite=True)
+    
+    encoded_url = request.args.get('url', '')
+    url         = unquote( encoded_url )
     
     print(f"[{stamp()}][{__name__}][✈] Using Playwright to navigate to { url } ...")
     
@@ -157,11 +161,12 @@ def visit( url ):
     return "200"
 
 
-@api.route( "/fetch/<url>"  )
-@api.route( "/fetch/<url>/" )
-def fetch( url ):
-    
-    data = []
+@api.route( "/fetch"  )
+@api.route( "/fetch/" )
+def fetch():    
+    data        = []
+    encoded_url = request.args.get('url', '')
+    url         = unquote( encoded_url )
     
     rows = sqlite_db.query_database( sqlite_queries.select_zap_history_by_url, (url,) )
     for row in rows:

@@ -125,6 +125,18 @@ def main( url ):
     """
     
     #
+    #   Initialization phase
+    #
+    
+    sql_database_required_tables = {
+        "ZapHistoryEntries" : sqlite_queries.create_zap_history_table,
+        "ZapCookies"        : sqlite_queries.create_zap_cookies, 
+        "ZapHeaders"        : sqlite_queries.create_zap_headers
+    }
+    sqlite_db.initialize_db( sql_database_required_tables, SQLITE_PATH )
+    
+    
+    #
     # start a new session
     #
     zap = connect_zap()
@@ -157,22 +169,7 @@ def main( url ):
         
     print(f"[{stamp()}][{__name__}][✓] Done! Pushed into database")
     
-    
-    
-    
-
 if __name__ == '__main__':
-    
-    #
-    #   Initialization phase
-    #
-    sql_database_required_tables = {
-        "ZapHistoryEntries" : sqlite_queries.create_zap_history_table,
-        "ZapCookies"        : sqlite_queries.create_zap_cookies, 
-        "ZapHeaders"        : sqlite_queries.create_zap_headers
-    }
-    sqlite_db.initialize_db( sql_database_required_tables, SQLITE_PATH )
-    
     #
     #   Main entry
     #
